@@ -25,4 +25,7 @@ RUN dotnet publish "LogoAliTem.API.csproj" -c Release -o /app/publish /p:UseAppH
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+ENV ASPNETCORE_ENVIRONMENT Production
+
 ENTRYPOINT ["dotnet", "LogoAliTem.API.dll"]
