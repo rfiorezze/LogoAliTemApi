@@ -1,3 +1,4 @@
+using CloudSql;
 using LogoAliTem.Application;
 using LogoAliTem.Application.Interfaces;
 using LogoAliTem.Domain.Identity;
@@ -31,7 +32,21 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        var connectionString = Configuration.GetConnectionString("Default");
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+        string connectionString;
+
+        if (env == "Production")
+        {
+            var host = Configuration.GetValue<string>("CloudSql:Host");
+            var dbUser = Configuration.GetValue<string>("CloudSql:DbUser");
+            var password = Configuration.GetValue<string>("CloudSql:Password");
+            var database = Configuration.GetValue<string>("CloudSql:Database");
+
+            connectionString = PostgreSqlUnix.NewPostgreSqlUnixSocketConnectionString(host, dbUser, password, database).ConnectionString;
+        }
+        else
+            connectionString = Configuration.GetConnectionString("Default"); 
+
         services.AddDbContext<LogoAliTemContext>(
             context => context.UseNpgsql(connectionString)
         );
