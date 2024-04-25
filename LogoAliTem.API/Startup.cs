@@ -91,9 +91,11 @@ public class Startup
         services.AddScoped<IMotoristaService, MotoristaService>();
         services.AddScoped<IBaseRepository, BaseRepository>();
         services.AddScoped<IMotoristaRepository, MotoristaRespository>();
+        services.AddScoped<IVeiculoRepository, VeiculoRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IVeiculoService, VeiculoService>();
 
         services.AddCors();
         services.AddSwaggerGen(options =>

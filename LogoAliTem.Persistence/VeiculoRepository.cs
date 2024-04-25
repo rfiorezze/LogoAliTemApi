@@ -14,23 +14,23 @@ public class VeiculoRepository : IVeiculoRepository
     {
         _context = context;
     }
-
     public async Task<Veiculo[]> GetAllVeiculosAsync()
     {
-        IQueryable<Veiculo> query = _context.Veiculos
-            .Include(v => v.Motorista);
+        IQueryable<Veiculo> query = _context.Veiculos;
 
-        query = query.OrderBy(v => v.Id);
+        query = query.AsNoTracking().OrderBy(m => m.Id);
 
         return await query.ToArrayAsync();
     }
 
-    public async Task<Veiculo[]> GetAllVeiculosByPlacaAsync(string placa)
+    public async Task<Veiculo[]> GetVeiculoByPlacaAsync(string placa)
     {
-        IQueryable<Veiculo> query = _context.Veiculos
-            .Include(v => v.Motorista);
+        IQueryable<Veiculo> query = _context.Veiculos;
 
-        query = query.OrderBy(v => v.Id).Where(v => v.Placa.ToLower().Contains(placa.ToLower()));
+        query = query
+            .OrderBy(m => m.Id)
+            .Where(m => m.Placa == placa)
+            .AsNoTracking();
 
         return await query.ToArrayAsync();
     }
@@ -41,8 +41,21 @@ public class VeiculoRepository : IVeiculoRepository
 
         query = query
             .OrderBy(m => m.Id)
-            .Where(m => m.Id == veiculoId);
+            .Where(m => m.Id == veiculoId)
+            .AsNoTracking();
 
         return await query.FirstOrDefaultAsync();
+    }
+
+    public async Task<Veiculo[]> GetVeiculosByMotoristaIdAsync(int motoristaId)
+    {
+        IQueryable<Veiculo> query = _context.Veiculos;
+
+        query = query
+            .OrderBy(m => m.Id)
+            .Where(m => m.MotoristaId == motoristaId)
+            .AsNoTracking();
+
+        return await query.ToArrayAsync();
     }
 }

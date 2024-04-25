@@ -6,7 +6,8 @@ namespace LogoAliTem.Persistence.Interfaces
     public interface IVeiculoRepository
     {
         Task<Veiculo[]> GetAllVeiculosAsync();
-        Task<Veiculo[]> GetAllVeiculosByPlacaAsync(string placa);
+        Task<Veiculo[]> GetVeiculoByPlacaAsync(string placa);
         Task<Veiculo> GetVeiculoByIdAsync(int veiculoId);
+        Task<Veiculo[]> GetVeiculosByMotoristaIdAsync(int motoristaId);
     }
 }

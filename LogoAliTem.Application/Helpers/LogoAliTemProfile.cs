@@ -22,5 +22,6 @@ public class LogoAliTemProfile : Profile
         CreateMap<User, UserDto>().ReverseMap();
         CreateMap<User, UserLoginDto>().ReverseMap();
         CreateMap<User, UserUpdateDto>().ReverseMap();
+        CreateMap<Veiculo, VeiculoDto>().ReverseMap();
     }
 }
