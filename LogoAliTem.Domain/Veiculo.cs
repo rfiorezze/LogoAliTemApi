@@ -11,6 +11,8 @@ public class Veiculo
     public string Modelo { get; set; }
     public string Categoria { get; set; }
     public string TipoCarroceria { get; set; }
+    public string Chassi { get; set; }
+    public string Renavam { get; set; }
     public int QtdEixos { get; set; }
     public int MotoristaId { get; set; }
     public Motorista Motorista { get; set; }

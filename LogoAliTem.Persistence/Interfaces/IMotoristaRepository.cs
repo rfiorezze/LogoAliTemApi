@@ -7,4 +7,5 @@ public interface IMotoristaRepository
     Task<Motorista[]> GetAllMotoristasAsync();
     Task<Motorista[]> GetAllMotoristasByNomeAsync(string nome);
     Task<Motorista> GetMotoristaByIdAsync(int motoristaId);
+    Task<Motorista> GetMotoristaByCpfAsync(string cpf);
 }

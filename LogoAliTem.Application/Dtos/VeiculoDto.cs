@@ -21,6 +21,15 @@ public class VeiculoDto
 
     public string Categoria { get; set; }
     public string TipoCarroceria { get; set; }
+
+    [StringLength(17, ErrorMessage = "É permitido apenas 17 caractere.")]
+    [Required(ErrorMessage = "O campo {0} é obrigatório.")]
+    public string Chassi { get; set; }
+
+    [StringLength(11, ErrorMessage = "É permitido apenas 11 caracteres.")]
+    [Required(ErrorMessage = "O campo {0} é obrigatório.")]
+    public string Renavam { get; set; }
+
     public int QtdEixos { get; set; }
     public int MotoristaId { get; set; }
     public int UserId { get; set; }

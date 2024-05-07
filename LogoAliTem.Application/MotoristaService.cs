@@ -106,6 +106,21 @@ public class MotoristaService : IMotoristaService
         }
     }
 
+    public async Task<MotoristaDto> GetMotoristaByCpfAsync(string cpf)
+    {
+        try
+        {
+            var motorista = await _motoristaRepository.GetMotoristaByCpfAsync(cpf);
+            if (motorista == null) return null;
+
+            return _mapper.Map<MotoristaDto>(motorista);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
     public async Task<MotoristaDto[]> GetAllMotoristasByNomeAsync(string nome)
     {
         try

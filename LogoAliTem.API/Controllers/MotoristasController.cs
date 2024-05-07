@@ -76,6 +76,23 @@ public class MotoristasController : ControllerBase
         }
     }
 
+    [HttpGet("cpf/{cpf}")]
+    public async Task<IActionResult> GetByCpf(string cpf)
+    {
+        try
+        {
+            var motorista = await _motoristaService.GetMotoristaByCpfAsync(cpf);
+
+            if (motorista == null) return NoContent();
+
+            return Ok(_mapper.Map<MotoristaDto>(motorista));
+        }
+        catch (Exception ex)
+        {
+            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar buscar motoristas por Cpf. Erro: {ex.Message}");
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> Post(MotoristaDto request)
     {

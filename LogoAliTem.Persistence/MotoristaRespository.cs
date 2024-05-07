@@ -34,6 +34,18 @@ public class MotoristaRespository : IMotoristaRepository
         return await query.ToArrayAsync();
     }
 
+    public async Task<Motorista> GetMotoristaByCpfAsync(string cpf)
+    {
+        IQueryable<Motorista> query = _context.Motoristas;
+
+        query = query
+            .AsNoTracking()
+            .OrderBy(m => m.Id)
+            .Where(m => m.Cpf == cpf);
+
+        return await query.FirstOrDefaultAsync();
+    }
+
     public async Task<Motorista> GetMotoristaByIdAsync(int motoristaId)
     {
         IQueryable<Motorista> query = _context.Motoristas;
