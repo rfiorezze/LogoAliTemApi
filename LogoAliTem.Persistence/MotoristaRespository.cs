@@ -22,6 +22,18 @@ public class MotoristaRespository : IMotoristaRepository
         return await query.ToArrayAsync();
     }
 
+    public async Task<Motorista[]> GetAllMotoristasByEstadoCidadeAsync(string estado, string cidade)
+    {
+        IQueryable<Motorista> query = _context.Motoristas;
+
+        query = query
+            .AsNoTracking()
+            .OrderBy(m => m.Id)
+            .Where(m => m.Estado.Equals(estado) && m.Cidade.Equals(cidade));
+
+        return await query.ToArrayAsync();
+    }
+
     public async Task<Motorista[]> GetAllMotoristasByNomeAsync(string nome)
     {
         IQueryable<Motorista> query = _context.Motoristas;

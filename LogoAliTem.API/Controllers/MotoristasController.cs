@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LogoAliTem.API.Controllers;
@@ -17,12 +17,10 @@ namespace LogoAliTem.API.Controllers;
 public class MotoristasController : ControllerBase
 {
     private readonly IMotoristaService _motoristaService;
-    private readonly IMapper _mapper;
 
-    public MotoristasController(IMotoristaService motoristaService, IMapper mapper)
+    public MotoristasController(IMotoristaService motoristaService)
     {
         _motoristaService = motoristaService;
-        _mapper = mapper;
     }
 
     [HttpGet]
@@ -34,7 +32,7 @@ public class MotoristasController : ControllerBase
 
             if (motoristas == null) return NoContent();
 
-            return Ok(_mapper.Map<List<MotoristaDto>>(motoristas));
+            return Ok(motoristas);
         }
         catch (Exception ex)
         {
@@ -51,7 +49,7 @@ public class MotoristasController : ControllerBase
 
             if (motorista == null) return NoContent();
 
-            return Ok(_mapper.Map<MotoristaDto>(motorista));
+            return Ok(motorista);
         }
         catch (Exception ex)
         {
@@ -68,11 +66,28 @@ public class MotoristasController : ControllerBase
 
             if (motoristas == null) return NoContent();
 
-            return Ok(_mapper.Map<MotoristaDto>(motoristas));
+            return Ok(motoristas);
         }
         catch (Exception ex)
         {
             return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar buscar motoristas por Nome. Erro: {ex.Message}");
+        }
+    }
+
+    [HttpGet("localidade/{estado}/{cidade}")]
+    public async Task<IActionResult> GetByNome(string estado, string cidade)
+    {
+        try
+        {
+            var motoristas = await _motoristaService.GetAllMotoristasByEstadoCidadeAsync(estado, cidade);
+
+            if (motoristas is null || !motoristas.Any()) return NoContent();
+
+            return Ok(motoristas);
+        }
+        catch (Exception ex)
+        {
+            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar buscar motoristas por estado e cidade. Erro: {ex.Message}");
         }
     }
 
@@ -85,7 +100,7 @@ public class MotoristasController : ControllerBase
 
             if (motorista == null) return NoContent();
 
-            return Ok(_mapper.Map<MotoristaDto>(motorista));
+            return Ok(motorista);
         }
         catch (Exception ex)
         {
@@ -103,7 +118,7 @@ public class MotoristasController : ControllerBase
 
             if (motorista == null) return BadRequest("Erro ao tentar adicionar um motorista");
 
-            return Ok(_mapper.Map<MotoristaDto>(motorista));
+            return Ok(motorista);
         }
         catch (Exception ex)
         {
@@ -125,7 +140,7 @@ public class MotoristasController : ControllerBase
         }
         catch (Exception ex)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, new {message = $"Erro ao tentar atualziar um motorista. Erro: {ex.Message}" });
+            return this.StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Erro ao tentar atualziar um motorista. Erro: {ex.Message}" });
         }
     }
 

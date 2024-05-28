@@ -10,6 +10,7 @@ public interface IMotoristaService
     Task<bool> DeleteMotorista(int motoristaId);
     Task<MotoristaDto[]> GetAllMotoristasAsync();
     Task<MotoristaDto[]> GetAllMotoristasByNomeAsync(string nome);
+    Task<MotoristaDto[]> GetAllMotoristasByEstadoCidadeAsync(string estado, string cidade);
     Task<MotoristaDto> GetMotoristaByCpfAsync(string cpf);
     Task<MotoristaDto> GetMotoristaByIdAsync(int motoristaId);
 }

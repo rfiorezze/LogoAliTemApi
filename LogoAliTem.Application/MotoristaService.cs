@@ -136,6 +136,21 @@ public class MotoristaService : IMotoristaService
         }
     }
 
+    public async Task<MotoristaDto[]> GetAllMotoristasByEstadoCidadeAsync(string estado, string cidade)
+    {
+        try
+        {
+            var motoristas = await _motoristaRepository.GetAllMotoristasByEstadoCidadeAsync(estado, cidade);
+            if (motoristas == null) return null;
+
+            return _mapper.Map<MotoristaDto[]>(motoristas);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
     public async Task<MotoristaDto> GetMotoristaByIdAsync(int motoristaId)
     {
         try
