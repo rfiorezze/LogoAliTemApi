@@ -2,7 +2,7 @@ using LogoAliTem.Domain.Identity;
 
 namespace LogoAliTem.Domain;
 
-public class Veiculo
+public class Veiculo : BaseEntity
 {
     public int Id { get; set; }
     public string Placa { get; set; }
@@ -16,6 +16,4 @@ public class Veiculo
     public int QtdEixos { get; set; }
     public int MotoristaId { get; set; }
     public Motorista Motorista { get; set; }
-    public int UserId { get; set; }
-    public User User { get; set; }
 }

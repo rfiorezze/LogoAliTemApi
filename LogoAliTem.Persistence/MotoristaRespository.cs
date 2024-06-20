@@ -13,6 +13,7 @@ public class MotoristaRespository : IMotoristaRepository
     {
         _context = context;
     }
+
     public async Task<Motorista[]> GetAllMotoristasAsync()
     {
         IQueryable<Motorista> query = _context.Motoristas;

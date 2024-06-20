@@ -1,12 +1,12 @@
-using LogoAliTem.Domain.Identity;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LogoAliTem.Domain;
 
 [Table("Motoristas")]
-public class Motorista
+public class Motorista : BaseEntity
 {
     [Key]
     public int Id { get; set; }
@@ -37,7 +37,6 @@ public class Motorista
     public string Complemento { get; set; }
     public string Bairro { get; set; }
     public string Cidade { get; set; }
-    public string Estado { get; set; }
-    public int UserId { get; set; }
-    public User User {get; set; }
+    public string Estado { get; set; }       
+    public ICollection<Veiculo> Veiculos { get; set; }
 }

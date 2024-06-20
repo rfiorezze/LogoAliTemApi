@@ -1,4 +1,3 @@
-using CloudSql;
 using LogoAliTem.Application;
 using LogoAliTem.Application.Interfaces;
 using LogoAliTem.Domain.Identity;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
@@ -32,21 +30,8 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        string connectionString;
-
-        if (env == "Production")
-        {
-            var host = Configuration.GetValue<string>("CloudSql:Host");
-            var dbUser = Configuration.GetValue<string>("CloudSql:DbUser");
-            var password = Configuration.GetValue<string>("CloudSql:Password");
-            var database = Configuration.GetValue<string>("CloudSql:Database");
-
-            connectionString = PostgreSqlUnix.NewPostgreSqlUnixSocketConnectionString(host, dbUser, password, database).ConnectionString;
-        }
-        else
-            connectionString = Configuration.GetConnectionString("Default"); 
-
+        string connectionString = Configuration.GetConnectionString("Default"); 
+        
         services.AddDbContext<LogoAliTemContext>(
             context => context.UseNpgsql(connectionString)
         );
@@ -104,7 +89,7 @@ public class Startup
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = @"JWT Authorization header usando Bearer.
-                                Entre com 'Bearer ' [espaço] então coloque seu token.
+                                Entre com 'Bearer ' [espaï¿½o] entï¿½o coloque seu token.
                                 Exemplo: 'Bearer 12345abcdef'",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
@@ -135,23 +120,21 @@ public class Startup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LogoAliTem.API v1"));
-        }
-
-        app.UseHttpsRedirection();
+        app.UseDeveloperExceptionPage();
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LogoAliTem.API v1"));
 
         app.UseRouting();
 
         app.UseAuthentication();
-        app.UseAuthorization();        
+        app.UseAuthorization();
 
-        app.UseCors(c => c.AllowAnyHeader()
-                         .AllowAnyMethod()
-                         .AllowAnyOrigin());
+        app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
+        app.UseHttpsRedirection();
 
         app.UseEndpoints(endpoints =>
         {

@@ -55,6 +55,7 @@ public class VeiculoService : IVeiculoService
 
             model.Id = veiculo.Id;
             model.UserId = userId;
+            model.DataAlteracao = DateTime.UtcNow;
 
             _baseRepository.Update(model);
             if (await _baseRepository.SaveChangesAsync())

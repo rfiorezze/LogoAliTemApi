@@ -42,6 +42,13 @@ public class LogoAliTemContext : IdentityDbContext<User, Role, int,
             .HasIndex(m => m.Celular)
             .IsUnique();
 
+        modelBuilder
+            .Entity<Motorista>()
+            .HasMany(m => m.Veiculos)
+            .WithOne(v => v.Motorista)
+            .HasForeignKey(v => v.MotoristaId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         base.OnModelCreating(modelBuilder);
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

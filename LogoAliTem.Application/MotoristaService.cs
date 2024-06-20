@@ -56,6 +56,7 @@ public class MotoristaService : IMotoristaService
 
             model.Id = motorista.Id;
             model.UserId = userId;
+            model.DataAlteracao = DateTime.UtcNow;
 
             _baseRepository.Update(model);
             if (await _baseRepository.SaveChangesAsync())
