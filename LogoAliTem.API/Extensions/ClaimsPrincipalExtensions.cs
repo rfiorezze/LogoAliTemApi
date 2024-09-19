@@ -4,9 +4,9 @@ namespace LogoAliTem.API.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static string GetUserName(this ClaimsPrincipal user)
+    public static string GetEmailUser(this ClaimsPrincipal user)
     {
-        return user.FindFirst(ClaimTypes.Name)?.Value;
+        return user.FindFirst(ClaimTypes.Email)?.Value;
     }
 
     public static int GetUserId(this ClaimsPrincipal user)

@@ -6,8 +6,8 @@ namespace LogoAliTem.Application;
 
 public interface IAccountService
 {
-    Task<bool> UserExists(string username);
-    Task<UserUpdateDto> GetUserByUsernameAsync(string username);
+    Task<bool> UserExists(string email);
+    Task<UserUpdateDto> GetUserByEmailAsync(string email);
     Task<SignInResult> CheckUserPasswordAsync(UserUpdateDto userUpdateDto, string password);
     Task<UserUpdateDto> CreateAccountAsync(UserDto userDto);
     Task<UserUpdateDto> UpdateAccount(UserUpdateDto userUpdateDto);

@@ -30,5 +30,9 @@ namespace LogoAliTem.Persistence
             return await _context.Users.SingleOrDefaultAsync(user=> user.UserName.Equals(username.ToLower()));
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.SingleOrDefaultAsync(user => user.Email.Equals(email.ToLower()));
+        }
     }
 }

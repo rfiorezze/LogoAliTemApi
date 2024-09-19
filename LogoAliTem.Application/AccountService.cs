@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using LogoAliTem.Application.Dtos;
 using LogoAliTem.Domain.Identity;
-using LogoAliTem.Persistence;
 using LogoAliTem.Persistence.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +28,7 @@ namespace LogoAliTem.Application
         {
             try
             {
-                var user = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == userUpdateDto.UserName.ToLower());
+                var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == userUpdateDto.Email.ToLower());
 
                 return await _signInManager.CheckPasswordSignInAsync(user, password, false);
 
@@ -45,6 +44,7 @@ namespace LogoAliTem.Application
             try
             {
                 var user = _mapper.Map<User>(userDto);
+
                 var result = await _userManager.CreateAsync(user, userDto.Password);
 
                 if (result.Succeeded)
@@ -60,11 +60,11 @@ namespace LogoAliTem.Application
             }
         }
 
-        public async Task<UserUpdateDto> GetUserByUsernameAsync(string username)
+        public async Task<UserUpdateDto> GetUserByEmailAsync(string email)
         {
             try
             {
-                var user = await _userRepository.GetUserByUsernameAsync(username);
+                var user = await _userRepository.GetUserByEmailAsync(email);
                 if (user is null) return null;
 
                 var userUpdateDto = _mapper.Map<UserUpdateDto>(user);
@@ -72,7 +72,7 @@ namespace LogoAliTem.Application
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao tentar buscar usuario. Erro: {ex.Message}");
+                throw new Exception($"Erro ao tentar buscar email. Erro: {ex.Message}");
             }
         }
 
@@ -80,7 +80,7 @@ namespace LogoAliTem.Application
         {
             try
             {
-                var user = await _userRepository.GetUserByUsernameAsync(userUpdateDto.UserName);
+                var user = await _userRepository.GetUserByEmailAsync(userUpdateDto.Email);
                 if (user is null) return null;
 
                 userUpdateDto.Id = user.Id;
@@ -97,7 +97,7 @@ namespace LogoAliTem.Application
 
                 if (await _userRepository.SaveChangesAsync())
                 {
-                    var userRetorno = await _userRepository.GetUserByUsernameAsync(user.UserName);
+                    var userRetorno = await _userRepository.GetUserByEmailAsync(user.Email);
 
                     return _mapper.Map<UserUpdateDto>(userRetorno);
                 }
@@ -110,11 +110,11 @@ namespace LogoAliTem.Application
             }
         }
 
-        public async Task<bool> UserExists(string username)
+        public async Task<bool> UserExists(string email)
         {
             try
             {
-                return await _userManager.Users.AnyAsync(u => u.UserName.Equals(username.ToLower()));
+                return await _userManager.Users.AnyAsync(u => u.Email.Equals(email.ToLower()));
             }
             catch (Exception ex)
             {

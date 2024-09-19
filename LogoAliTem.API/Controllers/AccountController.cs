@@ -29,13 +29,17 @@ public class AccountController : ControllerBase
     {
         try
         {
-            var userName = User.GetUserName();
-            var user = await _accountService.GetUserByUsernameAsync(userName);
+            var email = User.GetEmailUser();
+            var user = await _accountService.GetUserByEmailAsync(email);
             return Ok(user);
         }
         catch (Exception ex)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar buscar usuário. Erro: {ex.Message}");
+            return this.StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                codigoErro = 500,
+                mensagem = ex.Message
+            });
         }
     }
 
@@ -45,23 +49,37 @@ public class AccountController : ControllerBase
     {
         try
         {
-            if (await _accountService.UserExists(userDto.Username))
-                return BadRequest("Usuario já existe");
+            if (await _accountService.UserExists(userDto.Email))
+            {
+                return this.StatusCode(StatusCodes.Status400BadRequest, new
+                {
+                    codigoErro = 400,
+                    mensagem = "Usuário já cadastrado!"
+                });
+            }
 
             var user = await _accountService.CreateAccountAsync(userDto);
             if (user != null)
                 return Ok(new
                 {
-                    userName = user.UserName,
+                    Email = user.Email,
                     NomeCompleto = user.NomeCompleto,
                     token = _tokenService.CreateToken(user).Result
                 });
 
-            return BadRequest("Usuario não criado, tente novamente mais tarde!");
+            return this.StatusCode(StatusCodes.Status400BadRequest, new
+            {
+                codigoErro = 400,
+                mensagem = "Usuario não criado, tente novamente mais tarde!"
+            });
         }
         catch (Exception ex)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar criar usuário. Erro: {ex.Message}");
+            return this.StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                codigoErro = 500,
+                mensagem = ex.Message
+            });
         }
     }
 
@@ -70,10 +88,10 @@ public class AccountController : ControllerBase
     {
         try
         {
-            if (userUpdateDto.UserName != User.GetUserName())
+            if (userUpdateDto.Email != User.GetEmailUser())
                 return Unauthorized("Usuário Inválido");
 
-            var user = await _accountService.GetUserByUsernameAsync(User.GetUserName());
+            var user = await _accountService.GetUserByEmailAsync(User.GetEmailUser());
             if (user == null) return Unauthorized("Usuário Inválido");
 
             var userReturn = await _accountService.UpdateAccount(userUpdateDto);
@@ -81,15 +99,18 @@ public class AccountController : ControllerBase
 
             return Ok(new
             {
-                UserName = userReturn.UserName,
+                Email = userReturn.Email,
                 NomeCompleto = userReturn.NomeCompleto,
                 token = _tokenService.CreateToken(userReturn).Result
             });
         }
         catch (Exception ex)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError,
-                $"Erro ao tentar Atualizar Usuário. Erro: {ex.Message}");
+            return this.StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                codigoErro = 500,
+                mensagem = ex.Message
+            });
         }
     }
 
@@ -99,7 +120,7 @@ public class AccountController : ControllerBase
     {
         try
         {
-            var user = await _accountService.GetUserByUsernameAsync(userLogin.Username);
+            var user = await _accountService.GetUserByEmailAsync(userLogin.Email);
             if (user is null) return Unauthorized("Usuario ou Senha inválido");
 
             var result = await _accountService.CheckUserPasswordAsync(user, userLogin.Password);
@@ -107,14 +128,18 @@ public class AccountController : ControllerBase
 
             return Ok(new
             {
-                userName = user.UserName,
+                Email = user.Email,
                 NomeCompleto = user.NomeCompleto,
                 token = _tokenService.CreateToken(user).Result
             });
         }
         catch (Exception ex)
         {
-            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar criar usuário. Erro: {ex.Message}");
+            return this.StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                codigoErro = 500,
+                mensagem = ex.Message
+            });
         }
     }
 }
