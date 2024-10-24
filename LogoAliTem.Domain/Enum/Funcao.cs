@@ -2,8 +2,6 @@
 
 public enum Funcao
 {
-    Administrador,
-    Confederecao,
-    Federecao,
-    Sindicato
+    Usuario,
+    Administrador
 }

@@ -3,24 +3,29 @@ using EntityFramework.Exceptions.Common;
 using LogoAliTem.Application.Dtos;
 using LogoAliTem.Application.Interfaces;
 using LogoAliTem.Domain;
+using LogoAliTem.Domain.Enum;
 using LogoAliTem.Persistence.Interfaces;
 using System;
 using System.Threading.Tasks;
 
 namespace LogoAliTem.Application;
-
 public class MotoristaService : IMotoristaService
 {
     private readonly IBaseRepository _baseRepository;
     private readonly IMotoristaRepository _motoristaRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    public MotoristaService(IBaseRepository baseRepository, IMotoristaRepository motoristaRepository, IMapper mapper)
+
+    public MotoristaService(IBaseRepository baseRepository, IMotoristaRepository motoristaRepository,
+                            IMapper mapper, IUserRepository userRepository)
     {
         _baseRepository = baseRepository;
         _motoristaRepository = motoristaRepository;
         _mapper = mapper;
+        _userRepository = userRepository;
     }
 
+    // Adicionar motorista
     public async Task<MotoristaDto> AddMotorista(MotoristaDto requestDto, int userId)
     {
         try
@@ -46,6 +51,7 @@ public class MotoristaService : IMotoristaService
         }
     }
 
+    // Atualizar motorista
     public async Task<MotoristaDto> UpdateMotorista(int motoristaId, MotoristaDto requestDto, int userId)
     {
         try
@@ -76,6 +82,7 @@ public class MotoristaService : IMotoristaService
         }
     }
 
+    // Deletar motorista
     public async Task<bool> DeleteMotorista(int motoristaId)
     {
         try
@@ -92,11 +99,20 @@ public class MotoristaService : IMotoristaService
         }
     }
 
-    public async Task<MotoristaDto[]> GetAllMotoristasAsync()
+    // Listar todos os motoristas
+    public async Task<MotoristaDto[]> GetAllMotoristasAsync(int userId)
     {
         try
         {
-            var motoristas = await _motoristaRepository.GetAllMotoristasAsync();
+            var user = await _userRepository.GetUserByIdAsync(userId);
+
+            Motorista[] motoristas;
+
+            if (user.Funcao.Equals(Funcao.Administrador))
+                motoristas = await _motoristaRepository.GetAllMotoristasAsync();
+            else
+                motoristas = await _motoristaRepository.GetAllMotoristasByUserId(userId);
+
             if (motoristas == null) return null;
 
             return _mapper.Map<MotoristaDto[]>(motoristas);
@@ -107,63 +123,105 @@ public class MotoristaService : IMotoristaService
         }
     }
 
-    public async Task<MotoristaDto> GetMotoristaByCpfAsync(string cpf)
+    // Buscar motorista por CPF
+    public async Task<MotoristaDto> GetMotoristaByCpfAsync(string cpf, int userId)
     {
         try
         {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) throw new Exception("Usuário não encontrado.");
+
             var motorista = await _motoristaRepository.GetMotoristaByCpfAsync(cpf);
-            if (motorista == null) return null;
+
+            // Verifica se o usuário tem permissão para acessar o motorista
+            if (motorista == null || (!user.Funcao.Equals(Funcao.Administrador) && motorista.UserId != userId))
+                return null;
 
             return _mapper.Map<MotoristaDto>(motorista);
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception($"Erro ao tentar buscar motorista por CPF. Erro: {ex.Message}");
         }
     }
 
-    public async Task<MotoristaDto[]> GetAllMotoristasByNomeAsync(string nome)
+    // Buscar motoristas por nome
+    public async Task<MotoristaDto[]> GetAllMotoristasByNomeAsync(string nome, int userId)
     {
         try
         {
-            var motoristas = await _motoristaRepository.GetAllMotoristasByNomeAsync(nome);
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) throw new Exception("Usuário não encontrado.");
+
+            Motorista[] motoristas;
+
+            if (user.Funcao.Equals(Funcao.Administrador))
+            {
+                motoristas = await _motoristaRepository.GetAllMotoristasByNomeAsync(nome);
+            }
+            else
+            {
+                motoristas = await _motoristaRepository.GetAllMotoristasByNomeAndUserIdAsync(nome, userId);
+            }
+
             if (motoristas == null) return null;
 
             return _mapper.Map<MotoristaDto[]>(motoristas);
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception($"Erro ao tentar buscar motoristas por nome. Erro: {ex.Message}");
         }
     }
 
-    public async Task<MotoristaDto[]> GetAllMotoristasByEstadoCidadeAsync(string estado, string cidade)
+    // Buscar motoristas por estado e cidade
+    public async Task<MotoristaDto[]> GetAllMotoristasByEstadoCidadeAsync(string estado, string cidade, int userId)
     {
         try
         {
-            var motoristas = await _motoristaRepository.GetAllMotoristasByEstadoCidadeAsync(estado, cidade);
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) throw new Exception("Usuário não encontrado.");
+
+            Motorista[] motoristas;
+
+            if (user.Funcao.Equals(Funcao.Administrador))
+            {
+                motoristas = await _motoristaRepository.GetAllMotoristasByEstadoCidadeAsync(estado, cidade);
+            }
+            else
+            {
+                motoristas = await _motoristaRepository.GetAllMotoristasByEstadoCidadeAndUserIdAsync(estado, cidade, userId);
+            }
+
             if (motoristas == null) return null;
 
             return _mapper.Map<MotoristaDto[]>(motoristas);
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception($"Erro ao tentar buscar motoristas por estado e cidade. Erro: {ex.Message}");
         }
     }
 
-    public async Task<MotoristaDto> GetMotoristaByIdAsync(int motoristaId)
+    // Buscar motorista por ID
+    public async Task<MotoristaDto> GetMotoristaByIdAsync(int motoristaId, int userId)
     {
         try
         {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) throw new Exception("Usuário não encontrado.");
+
             var motorista = await _motoristaRepository.GetMotoristaByIdAsync(motoristaId);
-            if (motorista == null) return null;
+
+            // Verifica se o usuário tem permissão para acessar o motorista
+            if (motorista == null || (!user.Funcao.Equals(Funcao.Administrador) && motorista.UserId != userId))
+                return null;
 
             return _mapper.Map<MotoristaDto>(motorista);
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception($"Erro ao tentar buscar motorista por ID. Erro: {ex.Message}");
         }
     }
 }

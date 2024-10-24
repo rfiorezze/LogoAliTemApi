@@ -28,7 +28,7 @@ public class MotoristasController : ControllerBase
     {
         try
         {
-            var motoristas = await _motoristaService.GetAllMotoristasAsync();
+            var motoristas = await _motoristaService.GetAllMotoristasAsync(User.GetUserId());
 
             if (motoristas == null) return NoContent();
 
@@ -45,7 +45,7 @@ public class MotoristasController : ControllerBase
     {
         try
         {
-            var motorista = await _motoristaService.GetMotoristaByIdAsync(id);
+            var motorista = await _motoristaService.GetMotoristaByIdAsync(id, User.GetUserId());
 
             if (motorista == null) return NoContent();
 
@@ -62,7 +62,7 @@ public class MotoristasController : ControllerBase
     {
         try
         {
-            var motoristas = await _motoristaService.GetAllMotoristasByNomeAsync(nome);
+            var motoristas = await _motoristaService.GetAllMotoristasByNomeAsync(nome, User.GetUserId());
 
             if (motoristas == null) return NoContent();
 
@@ -79,7 +79,7 @@ public class MotoristasController : ControllerBase
     {
         try
         {
-            var motoristas = await _motoristaService.GetAllMotoristasByEstadoCidadeAsync(estado, cidade);
+            var motoristas = await _motoristaService.GetAllMotoristasByEstadoCidadeAsync(estado, cidade, User.GetUserId());
 
             if (motoristas is null || !motoristas.Any()) return NoContent();
 
@@ -96,7 +96,7 @@ public class MotoristasController : ControllerBase
     {
         try
         {
-            var motorista = await _motoristaService.GetMotoristaByCpfAsync(cpf);
+            var motorista = await _motoristaService.GetMotoristaByCpfAsync(cpf, User.GetUserId());
 
             if (motorista == null) return NoContent();
 
@@ -149,7 +149,7 @@ public class MotoristasController : ControllerBase
     {
         try
         {
-            var motorista = await _motoristaService.GetMotoristaByIdAsync(id);
+            var motorista = await _motoristaService.GetMotoristaByIdAsync(id, User.GetUserId());
             if (motorista == null) return NoContent();
 
             return await _motoristaService.DeleteMotorista(id)

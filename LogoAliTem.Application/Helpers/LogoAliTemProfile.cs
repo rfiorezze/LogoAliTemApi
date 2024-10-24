@@ -19,10 +19,12 @@ public class LogoAliTemProfile : Profile
             opt => opt.MapFrom(src => src.DataVencimentoCNH == null ? null : Convert.ToDateTime(src.DataVencimentoCNH).ToString("yyyy-MM-dd")))
         .ReverseMap();
 
-        CreateMap<User, UserDto>().ReverseMap();
+        CreateMap<User, UserDto>().ReverseMap()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+
         CreateMap<User, UserLoginDto>().ReverseMap();
         CreateMap<User, UserUpdateDto>()
-            .ForMember(dest=> dest.Funcao, opt => opt.MapFrom(src =>  (int)src.Funcao))
+            .ForMember(dest => dest.Funcao, opt => opt.MapFrom(src => (int)src.Funcao))
             .ReverseMap();
         CreateMap<Veiculo, VeiculoDto>().ReverseMap();
     }

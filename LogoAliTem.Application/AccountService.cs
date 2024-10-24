@@ -1,125 +1,156 @@
 ﻿using AutoMapper;
 using LogoAliTem.Application.Dtos;
+using LogoAliTem.Application.Interfaces;
 using LogoAliTem.Domain.Identity;
 using LogoAliTem.Persistence.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace LogoAliTem.Application
+namespace LogoAliTem.Application;
+public class AccountService : IAccountService
 {
-    public class AccountService : IAccountService
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
+    private readonly IMapper _mapper;
+    private readonly IUserRepository _userRepository;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
+
+    public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUserRepository userRepository, IEmailService emailService, IConfiguration configuration)
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
-        private readonly IMapper _mapper;
-        private readonly IUserRepository _userRepository;
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _mapper = mapper;
+        _userRepository = userRepository;
+        _emailService = emailService;
+        _configuration = configuration;
+    }
 
-        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUserRepository userRepository)
+    public async Task<SignInResult> CheckUserPasswordAsync(UserUpdateDto userUpdateDto, string password)
+    {
+        try
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _mapper = mapper;
-            _userRepository = userRepository;
-        }
+            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == userUpdateDto.Email.ToLower());
 
-        public async Task<SignInResult> CheckUserPasswordAsync(UserUpdateDto userUpdateDto, string password)
+            return await _signInManager.CheckPasswordSignInAsync(user, password, false);
+
+        }
+        catch (Exception ex)
         {
-            try
-            {
-                var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == userUpdateDto.Email.ToLower());
-
-                return await _signInManager.CheckPasswordSignInAsync(user, password, false);
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao tentar verificar password. Erro: {ex.Message}");
-            }
+            throw new Exception($"Erro ao tentar verificar password. Erro: {ex.Message}");
         }
+    }
 
-        public async Task<UserUpdateDto> CreateAccountAsync(UserDto userDto)
+    public async Task<UserUpdateDto> CreateAccountAsync(UserDto userDto)
+    {
+        try
         {
-            try
+            var user = _mapper.Map<User>(userDto);
+
+            var result = await _userManager.CreateAsync(user, userDto.Password);
+
+            if (result.Succeeded)
             {
-                var user = _mapper.Map<User>(userDto);
-
-                var result = await _userManager.CreateAsync(user, userDto.Password);
-
-                if (result.Succeeded)
-                {
-                    return _mapper.Map<UserUpdateDto>(user);
-                }
-
-                return null;
+                return _mapper.Map<UserUpdateDto>(user);
             }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao tentar criar usuario. Erro: {ex.Message}");
-            }
+
+            return null;
         }
-
-        public async Task<UserUpdateDto> GetUserByEmailAsync(string email)
+        catch (Exception ex)
         {
-            try
-            {
-                var user = await _userRepository.GetUserByEmailAsync(email);
-                if (user is null) return null;
-
-                var userUpdateDto = _mapper.Map<UserUpdateDto>(user);
-                return userUpdateDto;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao tentar buscar email. Erro: {ex.Message}");
-            }
+            throw new Exception($"Erro ao tentar criar usuario. Erro: {ex.Message}");
         }
+    }
 
-        public async Task<UserUpdateDto> UpdateAccount(UserUpdateDto userUpdateDto)
+    public async Task<UserUpdateDto> GetUserByEmailAsync(string email)
+    {
+        try
         {
-            try
-            {
-                var user = await _userRepository.GetUserByEmailAsync(userUpdateDto.Email);
-                if (user is null) return null;
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user is null) return null;
 
-                userUpdateDto.Id = user.Id;
-
-                _mapper.Map(userUpdateDto, user);
-
-                if (userUpdateDto.Password != null)
-                {
-                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    await _userManager.ResetPasswordAsync(user, token, userUpdateDto.Password);
-                }
-
-                _userRepository.Update<User>(user);
-
-                if (await _userRepository.SaveChangesAsync())
-                {
-                    var userRetorno = await _userRepository.GetUserByEmailAsync(user.Email);
-
-                    return _mapper.Map<UserUpdateDto>(userRetorno);
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao tentar atualizar usuario. Erro: {ex.Message}");
-            }
+            var userUpdateDto = _mapper.Map<UserUpdateDto>(user);
+            return userUpdateDto;
         }
-
-        public async Task<bool> UserExists(string email)
+        catch (Exception ex)
         {
-            try
-            {
-                return await _userManager.Users.AnyAsync(u => u.Email.Equals(email.ToLower()));
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao tentar verificar se usuario existe. Erro: {ex.Message}");
-            }
+            throw new Exception($"Erro ao tentar buscar email. Erro: {ex.Message}");
         }
+    }
+
+    public async Task<UserUpdateDto> UpdateAccount(UserUpdateDto userUpdateDto)
+    {
+        try
+        {
+            var user = await _userRepository.GetUserByEmailAsync(userUpdateDto.Email);
+            if (user is null) return null;
+
+            userUpdateDto.Id = user.Id;
+
+            _mapper.Map(userUpdateDto, user);
+
+            _userRepository.Update<User>(user);
+
+            if (await _userRepository.SaveChangesAsync())
+            {
+                var userRetorno = await _userRepository.GetUserByEmailAsync(user.Email);
+
+                return _mapper.Map<UserUpdateDto>(userRetorno);
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Erro ao tentar atualizar usuario. Erro: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> UserExists(string email)
+    {
+        try
+        {
+            return await _userManager.Users.AnyAsync(u => u.Email.Equals(email.ToLower()));
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Erro ao tentar verificar se usuario existe. Erro: {ex.Message}");
+        }
+    }
+
+    // Envio de e-mail com link de redefinição de senha
+    public async Task<bool> SendPasswordResetLinkAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null) return false;
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+        // Recupera a URL base do appsettings
+        var baseUrl = _configuration["Application:BaseUrl"];
+        var resetLink = $"{baseUrl}/user/reset-password?token={encodedToken}&email={user.Email}";
+
+        await _emailService.EnviarEmailAsync(email, "Redefinição de Senha", $"Clique no link para redefinir sua senha: {resetLink}");
+
+        return true;
+    }
+
+    // Reset de senha com token
+    public async Task<bool> ResetUserPasswordAsync(string email, string token, string newPassword)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null) return false;
+
+        // Decodificando o token recebido pela URL
+        var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
+        return result.Succeeded;
     }
 }

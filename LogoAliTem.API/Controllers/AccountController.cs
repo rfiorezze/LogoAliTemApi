@@ -4,6 +4,7 @@ using LogoAliTem.Application.Dtos;
 using LogoAliTem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -140,6 +141,40 @@ public class AccountController : ControllerBase
                 codigoErro = 500,
                 mensagem = ex.Message
             });
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost("ForgotPassword")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+    {
+        try
+        {
+            var result = await _accountService.SendPasswordResetLinkAsync(forgotPasswordDto.Email);
+            if (!result) return BadRequest("Falha ao enviar o e-mail de recuperação de senha.");
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao processar sua solicitação: {ex.Message}");
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost("ResetPassword")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        try
+        {
+            var result = await _accountService.ResetUserPasswordAsync(resetPasswordDto.Email, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+            if (!result) return BadRequest("Erro ao redefinir a senha.");
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao processar sua solicitação: {ex.Message}");
         }
     }
 }
