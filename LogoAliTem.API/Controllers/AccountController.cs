@@ -4,7 +4,6 @@ using LogoAliTem.Application.Dtos;
 using LogoAliTem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -131,6 +130,7 @@ public class AccountController : ControllerBase
             {
                 Email = user.Email,
                 NomeCompleto = user.NomeCompleto,
+                Telefone = user.Telefone,
                 token = _tokenService.CreateToken(user).Result
             });
         }
