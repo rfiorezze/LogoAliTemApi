@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LogoAliTem.API.Controllers;
@@ -60,17 +61,37 @@ public class AccountController : ControllerBase
 
             var user = await _accountService.CreateAccountAsync(userDto);
             if (user != null)
+            {
+                // Mapeando os roles fornecidos no DTO
+                if (userDto.UserRoles != null && userDto.UserRoles.Any())
+                {
+                    var rolesResult = await _accountService.AddUserRolesAsync(user.Email, userDto.UserRoles);
+                    if (!rolesResult)
+                    {
+                        return this.StatusCode(StatusCodes.Status400BadRequest, new
+                        {
+                            codigoErro = 400,
+                            mensagem = "Erro ao associar roles ao usuário!"
+                        });
+                    }
+                }
+
+                var roles = await _accountService.GetUserRolesAsync(user.Email);
+
                 return Ok(new
                 {
                     Email = user.Email,
                     NomeCompleto = user.NomeCompleto,
-                    token = _tokenService.CreateToken(user).Result
+                    Telefone = user.Telefone,
+                    UserRoles = roles,
+                    token = await _tokenService.CreateToken(user)
                 });
+            }
 
             return this.StatusCode(StatusCodes.Status400BadRequest, new
             {
                 codigoErro = 400,
-                mensagem = "Usuario não criado, tente novamente mais tarde!"
+                mensagem = "Usuário não criado, tente novamente mais tarde!"
             });
         }
         catch (Exception ex)
@@ -97,11 +118,29 @@ public class AccountController : ControllerBase
             var userReturn = await _accountService.UpdateAccount(userUpdateDto);
             if (userReturn == null) return NoContent();
 
+            // Atualizando os roles
+            if (userUpdateDto.UserRoles != null && userUpdateDto.UserRoles.Any())
+            {
+                var rolesResult = await _accountService.UpdateUserRolesAsync(userReturn.Email, userUpdateDto.UserRoles);
+                if (!rolesResult)
+                {
+                    return this.StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        codigoErro = 400,
+                        mensagem = "Erro ao atualizar os roles do usuário!"
+                    });
+                }
+            }
+
+            var roles = await _accountService.GetUserRolesAsync(userReturn.Email);
+
             return Ok(new
             {
                 Email = userReturn.Email,
                 NomeCompleto = userReturn.NomeCompleto,
-                token = _tokenService.CreateToken(userReturn).Result
+                Telefone = userReturn.Telefone,
+                UserRoles = roles,
+                token = await _tokenService.CreateToken(userReturn)
             });
         }
         catch (Exception ex)
@@ -121,17 +160,21 @@ public class AccountController : ControllerBase
         try
         {
             var user = await _accountService.GetUserByEmailAsync(userLogin.Email);
-            if (user is null) return Unauthorized("Usuario ou Senha inválido");
+            if (user is null) return Unauthorized("Usuário ou Senha inválidos");
 
             var result = await _accountService.CheckUserPasswordAsync(user, userLogin.Password);
             if (!result.Succeeded) return Unauthorized();
+
+            // Mapeando os roles associados ao usuário
+            var roles = await _accountService.GetUserRolesAsync(user.Email);
 
             return Ok(new
             {
                 Email = user.Email,
                 NomeCompleto = user.NomeCompleto,
                 Telefone = user.Telefone,
-                token = _tokenService.CreateToken(user).Result
+                UserRoles = roles, // Aqui retorna como string[]
+                token = await _tokenService.CreateToken(user)
             });
         }
         catch (Exception ex)

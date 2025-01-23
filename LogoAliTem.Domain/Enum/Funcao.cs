@@ -2,6 +2,7 @@
 
 public enum Funcao
 {
-    Usuario,
+    Motorista,
+    Sindicato,
     Administrador
 }

@@ -1,5 +1,6 @@
 ﻿using LogoAliTem.Application.Dtos;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LogoAliTem.Application;
@@ -13,4 +14,7 @@ public interface IAccountService
     Task<UserUpdateDto> UpdateAccount(UserUpdateDto userUpdateDto);
     Task<bool> SendPasswordResetLinkAsync(string email);
     Task<bool> ResetUserPasswordAsync(string email, string token, string newPassword);
+    Task<IEnumerable<string>> GetUserRolesAsync(string email);
+    Task<bool> AddUserRolesAsync(string email, IEnumerable<string> roles);
+    Task<bool> UpdateUserRolesAsync(string email, IEnumerable<string> newRoles);
 }

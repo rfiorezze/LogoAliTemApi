@@ -106,12 +106,7 @@ public class MotoristaService : IMotoristaService
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
 
-            Motorista[] motoristas;
-
-            if (user.Funcao.Equals(Funcao.Administrador))
-                motoristas = await _motoristaRepository.GetAllMotoristasAsync();
-            else
-                motoristas = await _motoristaRepository.GetAllMotoristasByUserId(userId);
+            var motoristas = await _motoristaRepository.GetAllMotoristasAsync();
 
             if (motoristas == null) return null;
 
@@ -133,10 +128,6 @@ public class MotoristaService : IMotoristaService
 
             var motorista = await _motoristaRepository.GetMotoristaByCpfAsync(cpf);
 
-            // Verifica se o usuário tem permissão para acessar o motorista
-            if (motorista == null || (!user.Funcao.Equals(Funcao.Administrador) && motorista.UserId != userId))
-                return null;
-
             return _mapper.Map<MotoristaDto>(motorista);
         }
         catch (Exception ex)
@@ -153,16 +144,7 @@ public class MotoristaService : IMotoristaService
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null) throw new Exception("Usuário não encontrado.");
 
-            Motorista[] motoristas;
-
-            if (user.Funcao.Equals(Funcao.Administrador))
-            {
-                motoristas = await _motoristaRepository.GetAllMotoristasByNomeAsync(nome);
-            }
-            else
-            {
-                motoristas = await _motoristaRepository.GetAllMotoristasByNomeAndUserIdAsync(nome, userId);
-            }
+            var motoristas = await _motoristaRepository.GetAllMotoristasByNomeAsync(nome);
 
             if (motoristas == null) return null;
 
@@ -182,16 +164,7 @@ public class MotoristaService : IMotoristaService
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null) throw new Exception("Usuário não encontrado.");
 
-            Motorista[] motoristas;
-
-            if (user.Funcao.Equals(Funcao.Administrador))
-            {
-                motoristas = await _motoristaRepository.GetAllMotoristasByEstadoCidadeAsync(estado, cidade);
-            }
-            else
-            {
-                motoristas = await _motoristaRepository.GetAllMotoristasByEstadoCidadeAndUserIdAsync(estado, cidade, userId);
-            }
+            var motoristas = await _motoristaRepository.GetAllMotoristasByEstadoCidadeAsync(estado, cidade);
 
             if (motoristas == null) return null;
 
@@ -212,10 +185,6 @@ public class MotoristaService : IMotoristaService
             if (user == null) throw new Exception("Usuário não encontrado.");
 
             var motorista = await _motoristaRepository.GetMotoristaByIdAsync(motoristaId);
-
-            // Verifica se o usuário tem permissão para acessar o motorista
-            if (motorista == null || (!user.Funcao.Equals(Funcao.Administrador) && motorista.UserId != userId))
-                return null;
 
             return _mapper.Map<MotoristaDto>(motorista);
         }

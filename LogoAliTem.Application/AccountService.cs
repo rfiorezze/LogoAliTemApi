@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -153,4 +155,65 @@ public class AccountService : IAccountService
         var result = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
         return result.Succeeded;
     }
+
+    public async Task<IEnumerable<string>> GetUserRolesAsync(string email)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return null;
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Erro ao obter os roles do usuário. Erro: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> AddUserRolesAsync(string email, IEnumerable<string> roles)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return false;
+
+            var result = await _userManager.AddToRolesAsync(user, roles);
+            return result.Succeeded;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Erro ao adicionar roles ao usuário. Erro: {ex.Message}");
+        }
+    }
+
+
+    public async Task<bool> UpdateUserRolesAsync(string email, IEnumerable<string> newRoles)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return false;
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            // Removendo roles que não estão na nova lista
+            var rolesToRemove = currentRoles.Except(newRoles);
+            var removeResult = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+
+            if (!removeResult.Succeeded) return false;
+
+            // Adicionando novos roles
+            var rolesToAdd = newRoles.Except(currentRoles);
+            var addResult = await _userManager.AddToRolesAsync(user, rolesToAdd);
+
+            return addResult.Succeeded;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Erro ao atualizar roles do usuário. Erro: {ex.Message}");
+        }
+    }
+
 }

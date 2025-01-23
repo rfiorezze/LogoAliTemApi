@@ -37,6 +37,7 @@ public class Motorista : BaseEntity
     public string Complemento { get; set; }
     public string Bairro { get; set; }
     public string Cidade { get; set; }
-    public string Estado { get; set; }       
+    public string Estado { get; set; }
+    public string PlacaVeiculoPrincipal { get; set; }
     public ICollection<Veiculo> Veiculos { get; set; }
 }
