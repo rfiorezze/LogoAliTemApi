@@ -160,12 +160,11 @@ public class AccountController : ControllerBase
         try
         {
             var user = await _accountService.GetUserByEmailAsync(userLogin.Email);
-            if (user is null) return Unauthorized("Usuário ou Senha inválidos");
+            if (user is null) return Unauthorized("Usuário ou senha inválidos");
 
             var result = await _accountService.CheckUserPasswordAsync(user, userLogin.Password);
             if (!result.Succeeded) return Unauthorized();
 
-            // Mapeando os roles associados ao usuário
             var roles = await _accountService.GetUserRolesAsync(user.Email);
 
             return Ok(new
@@ -173,8 +172,8 @@ public class AccountController : ControllerBase
                 Email = user.Email,
                 NomeCompleto = user.NomeCompleto,
                 Telefone = user.Telefone,
-                UserRoles = roles, // Aqui retorna como string[]
-                token = await _tokenService.CreateToken(user)
+                UserRoles = roles, // Inclui os roles no retorno
+                Token = await _tokenService.CreateToken(user)
             });
         }
         catch (Exception ex)

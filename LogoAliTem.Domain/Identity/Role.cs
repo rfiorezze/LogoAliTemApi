@@ -5,5 +5,5 @@ namespace LogoAliTem.Domain.Identity;
 
 public class Role : IdentityRole<int>
 {
-    public IEnumerable<UserRole> UserRoles { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }

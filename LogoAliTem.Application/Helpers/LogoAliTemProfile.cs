@@ -3,28 +3,54 @@ using LogoAliTem.Application.Dtos;
 using LogoAliTem.Domain;
 using LogoAliTem.Domain.Identity;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace LogoAliTem.Application.Helpers;
-
-public class LogoAliTemProfile : Profile
+namespace LogoAliTem.Application.Helpers
 {
-    public LogoAliTemProfile()
+    public class LogoAliTemProfile : Profile
     {
-        CreateMap<Motorista, MotoristaDto>()
-            .ForMember(
-            dest => dest.DataNascimento,
-            opt => opt.MapFrom(src => src.DataNascimento.ToString("yyyy-MM-dd")))
-            .ForMember(
-            dest => dest.DataVencimentoCNH,
-            opt => opt.MapFrom(src => src.DataVencimentoCNH == null ? null : Convert.ToDateTime(src.DataVencimentoCNH).ToString("yyyy-MM-dd")))
-        .ReverseMap();
+        public LogoAliTemProfile()
+        {
+            // Motorista
+            CreateMap<Motorista, MotoristaDto>()
+                .ForMember(
+                    dest => dest.DataNascimento,
+                    opt => opt.MapFrom(src => src.DataNascimento.ToString("yyyy-MM-dd")))
+                .ForMember(
+                    dest => dest.DataVencimentoCNH,
+                    opt => opt.MapFrom(src => src.DataVencimentoCNH == null ? null : Convert.ToDateTime(src.DataVencimentoCNH).ToString("yyyy-MM-dd")))
+                .ReverseMap();
 
-        CreateMap<User, UserDto>().ReverseMap()
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+            // User <-> UserDto
+            CreateMap<User, UserDto>()
+                .ForMember(
+                    dest => dest.UserRoles,
+                    opt => opt.MapFrom(src => src.UserRoles != null
+                        ? src.UserRoles.Select(ur => ur.Role.Name).ToList()
+                        : new List<string>()))
+                .ReverseMap()
+                .ForMember(
+                    dest => dest.UserRoles,
+                    opt => opt.Ignore()); // Atribuir UserRoles manualmente no backend
 
-        CreateMap<User, UserLoginDto>().ReverseMap();
-        CreateMap<User, UserUpdateDto>()
-            .ReverseMap();
-        CreateMap<Veiculo, VeiculoDto>().ReverseMap();
+            // User <-> UserLoginDto
+            CreateMap<User, UserLoginDto>().ReverseMap();
+
+            // User <-> UserUpdateDto
+            CreateMap<User, UserUpdateDto>()
+                .ForMember(
+                    dest => dest.UserRoles,
+                    opt => opt.MapFrom(src => src.UserRoles != null
+                        ? src.UserRoles.Select(ur => ur.Role.Name).ToList()
+                        : new List<string>()))
+                .ReverseMap()
+                .ForMember(
+                    dest => dest.UserRoles,
+                    opt => opt.Ignore()); // Gerenciar manualmente no backend
+
+            // Veiculo
+            CreateMap<Veiculo, VeiculoDto>().ReverseMap();
+        }
     }
 }

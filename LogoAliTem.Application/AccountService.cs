@@ -50,24 +50,26 @@ public class AccountService : IAccountService
 
     public async Task<UserUpdateDto> CreateAccountAsync(UserDto userDto)
     {
-        try
+        var user = _mapper.Map<User>(userDto);
+        var result = await _userManager.CreateAsync(user, userDto.Password);
+
+        if (result.Succeeded)
         {
-            var user = _mapper.Map<User>(userDto);
-
-            var result = await _userManager.CreateAsync(user, userDto.Password);
-
-            if (result.Succeeded)
+            // Atribui os papéis enviados pelo cliente
+            if (userDto.UserRoles != null)
             {
-                return _mapper.Map<UserUpdateDto>(user);
+                foreach (var role in userDto.UserRoles)
+                {
+                    await _userManager.AddToRoleAsync(user, role);
+                }
             }
 
-            return null;
+            return _mapper.Map<UserUpdateDto>(user);
         }
-        catch (Exception ex)
-        {
-            throw new Exception($"Erro ao tentar criar usuario. Erro: {ex.Message}");
-        }
+
+        throw new Exception("Erro ao criar usuário.");
     }
+
 
     public async Task<UserUpdateDto> GetUserByEmailAsync(string email)
     {
