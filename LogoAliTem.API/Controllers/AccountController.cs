@@ -62,20 +62,7 @@ public class AccountController : ControllerBase
             var user = await _accountService.CreateAccountAsync(userDto);
             if (user != null)
             {
-                // Mapeando os roles fornecidos no DTO
-                if (userDto.UserRoles != null && userDto.UserRoles.Any())
-                {
-                    var rolesResult = await _accountService.AddUserRolesAsync(user.Email, userDto.UserRoles);
-                    if (!rolesResult)
-                    {
-                        return this.StatusCode(StatusCodes.Status400BadRequest, new
-                        {
-                            codigoErro = 400,
-                            mensagem = "Erro ao associar roles ao usuário!"
-                        });
-                    }
-                }
-
+                // Recupera as roles associadas ao usuário para resposta
                 var roles = await _accountService.GetUserRolesAsync(user.Email);
 
                 return Ok(new
@@ -83,6 +70,9 @@ public class AccountController : ControllerBase
                     Email = user.Email,
                     NomeCompleto = user.NomeCompleto,
                     Telefone = user.Telefone,
+                    Cpf = user.Cpf,
+                    Sexo = user.Sexo,
+                    DataNascimento = user.DataNascimento,
                     UserRoles = roles,
                     token = await _tokenService.CreateToken(user)
                 });
@@ -139,6 +129,9 @@ public class AccountController : ControllerBase
                 Email = userReturn.Email,
                 NomeCompleto = userReturn.NomeCompleto,
                 Telefone = userReturn.Telefone,
+                Cpf = user.Cpf,
+                Sexo = user.Sexo,
+                DataNascimento = user.DataNascimento,
                 UserRoles = roles,
                 token = await _tokenService.CreateToken(userReturn)
             });
@@ -172,6 +165,9 @@ public class AccountController : ControllerBase
                 Email = user.Email,
                 NomeCompleto = user.NomeCompleto,
                 Telefone = user.Telefone,
+                Cpf = user.Cpf,
+                Sexo = user.Sexo,
+                DataNascimento = user.DataNascimento,
                 UserRoles = roles, // Inclui os roles no retorno
                 Token = await _tokenService.CreateToken(user)
             });

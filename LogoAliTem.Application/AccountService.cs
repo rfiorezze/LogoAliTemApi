@@ -51,12 +51,16 @@ public class AccountService : IAccountService
     public async Task<UserUpdateDto> CreateAccountAsync(UserDto userDto)
     {
         var user = _mapper.Map<User>(userDto);
+
+        // Certifique-se de que UserName recebe o valor do Email
+        user.UserName = user.Email;
+
         var result = await _userManager.CreateAsync(user, userDto.Password);
 
         if (result.Succeeded)
         {
             // Atribui os papéis enviados pelo cliente
-            if (userDto.UserRoles != null)
+            if (userDto.UserRoles != null && userDto.UserRoles.Any())
             {
                 foreach (var role in userDto.UserRoles)
                 {
@@ -70,7 +74,6 @@ public class AccountService : IAccountService
         throw new Exception("Erro ao criar usuário.");
     }
 
-
     public async Task<UserUpdateDto> GetUserByEmailAsync(string email)
     {
         try
@@ -78,7 +81,12 @@ public class AccountService : IAccountService
             var user = await _userRepository.GetUserByEmailAsync(email);
             if (user is null) return null;
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var userUpdateDto = _mapper.Map<UserUpdateDto>(user);
+
+            userUpdateDto.UserRoles = roles;
+
             return userUpdateDto;
         }
         catch (Exception ex)
@@ -96,6 +104,10 @@ public class AccountService : IAccountService
 
             userUpdateDto.Id = user.Id;
 
+            // Atualiza UserName ao atualizar o Email
+            userUpdateDto.Email = userUpdateDto.Email.ToLower();
+            user.UserName = userUpdateDto.Email;
+
             _mapper.Map(userUpdateDto, user);
 
             _userRepository.Update<User>(user);
@@ -111,7 +123,7 @@ public class AccountService : IAccountService
         }
         catch (Exception ex)
         {
-            throw new Exception($"Erro ao tentar atualizar usuario. Erro: {ex.Message}");
+            throw new Exception($"Erro ao tentar atualizar usuário. Erro: {ex.Message}");
         }
     }
 

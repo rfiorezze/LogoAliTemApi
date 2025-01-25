@@ -23,7 +23,8 @@ namespace LogoAliTem.Domain.Identity
 
         [Required(ErrorMessage = "O sexo é obrigatório.")]
         [MaxLength(1, ErrorMessage = "O sexo deve ser representado por um único caractere.")]
-        public Sexo Sexo { get; set; }
+        [RegularExpression("^[MF]$", ErrorMessage = "O sexo deve ser 'M' (Masculino) ou 'F' (Feminino).")]
+        public string Sexo { get; set; }
 
         [Required(ErrorMessage = "A data de nascimento é obrigatória.")]
         public DateTime DataNascimento { get; set; }

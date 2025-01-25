@@ -3,6 +3,7 @@ using System;
 using LogoAliTem.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LogoAliTem.Persistence.Migrations
 {
     [DbContext(typeof(LogoAliTemContext))]
-    partial class LogoAliTemContextModelSnapshot : ModelSnapshot
+    [Migration("20250123153538_Alteracoes2025_3")]
+    partial class Alteracoes2025_3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

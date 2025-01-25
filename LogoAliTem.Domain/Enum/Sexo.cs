@@ -1,5 +1,5 @@
 ﻿public enum Sexo
 {
-    Masculino = 'M',
-    Feminino = 'F'
+    M, // Masculino
+    F  // Feminino
 }

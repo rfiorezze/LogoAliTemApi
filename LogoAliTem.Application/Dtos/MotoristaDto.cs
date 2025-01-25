@@ -41,4 +41,5 @@ public class MotoristaDto
     public string Cidade { get; set; }
     public string Estado { get; set; }
     public int UserId { get; set; }
+    public string PlacaVeiculoPrincipal { get; set; }
 }
