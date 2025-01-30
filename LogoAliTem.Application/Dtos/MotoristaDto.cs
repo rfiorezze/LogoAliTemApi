@@ -21,12 +21,11 @@ public class MotoristaDto
     public string DataNascimento { get; set; }
 
     [StringLength(9, ErrorMessage = "É permitido apenas 9 caracteres.")]
-    [Required(ErrorMessage = "O campo {0} é obrigatório.")]
     public string NumeroCNH { get; set; }
 
     [StringLength(1, ErrorMessage = "É permitido apenas 1 caractere.")]
-    [Required(ErrorMessage = "O campo {0} é obrigatório.")]
     public string CategoriaCNH { get; set; }
+
     public string DataVencimentoCNH { get; set; }
 
     [Display(Name = "e-mail")]

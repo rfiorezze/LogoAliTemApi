@@ -77,6 +77,7 @@ public class AccountService : IAccountService
                 DataNascimento = user.DataNascimento.ToString(),
                 Celular = user.Telefone,
                 Email = user.Email,
+                Sexo = user.Sexo,                
                 PlacaVeiculoPrincipal = userDto.PlacaVeiculoPrincipal
             };
 
