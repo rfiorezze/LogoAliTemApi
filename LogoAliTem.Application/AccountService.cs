@@ -21,15 +21,17 @@ public class AccountService : IAccountService
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepository;
     private readonly IEmailService _emailService;
+    private readonly IMotoristaService _motoristaService;
     private readonly IConfiguration _configuration;
 
-    public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUserRepository userRepository, IEmailService emailService, IConfiguration configuration)
+    public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUserRepository userRepository, IEmailService emailService, IMotoristaService motoristaService, IConfiguration configuration)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _mapper = mapper;
         _userRepository = userRepository;
-        _emailService = emailService;
+        _emailService = emailService;        
+        _motoristaService = motoristaService;
         _configuration = configuration;
     }
 
@@ -67,6 +69,19 @@ public class AccountService : IAccountService
                     await _userManager.AddToRoleAsync(user, role);
                 }
             }
+
+            var motorista = new MotoristaDto
+            {
+                Nome = user.NomeCompleto,
+                Cpf = user.Cpf,
+                DataNascimento = user.DataNascimento.ToString(),
+                Celular = user.Telefone,
+                Email = user.Email,
+                PlacaVeiculoPrincipal = userDto.PlacaVeiculoPrincipal
+            };
+
+            await _motoristaService.AddMotorista(motorista, user.Id);
+            
 
             return _mapper.Map<UserUpdateDto>(user);
         }

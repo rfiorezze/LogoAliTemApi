@@ -34,6 +34,8 @@ namespace LogoAliTem.Application.Dtos
         [DataType(DataType.Date, ErrorMessage = "Data de nascimento inválida")]
         public DateTime DataNascimento { get; set; }
 
+        public string PlacaVeiculoPrincipal { get; set; }
+
         public IEnumerable<string> UserRoles { get; set; }
     }
 }
