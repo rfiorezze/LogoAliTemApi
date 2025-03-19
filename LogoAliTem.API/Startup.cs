@@ -82,6 +82,8 @@ public class Startup
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IVeiculoService, VeiculoService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<ILocalizacaoService, LocalizacaoService>();
+        services.AddScoped<IReboqueService, ReboqueService>();
 
         services.AddCors();
         services.AddSwaggerGen(options =>

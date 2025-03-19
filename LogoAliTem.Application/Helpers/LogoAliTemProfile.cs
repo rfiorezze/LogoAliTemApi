@@ -47,5 +47,9 @@ public class LogoAliTemProfile : Profile
 
         // Veiculo
         CreateMap<Veiculo, VeiculoDto>().ReverseMap();
+
+        // Reboque
+        CreateMap<ReboqueCalculoDto, ReboqueSolicitacaoDto>().ReverseMap(); // Caso precise transformar um no outro
+        CreateMap<ReboqueSolicitacao, ReboqueSolicitacaoDto>().ReverseMap(); // Para persistência no banco
     }
 }
