@@ -1,10 +1,12 @@
 ﻿using LogoAliTem.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class LocalizacaoController : ControllerBase
 {
@@ -19,6 +21,7 @@ public class LocalizacaoController : ControllerBase
     /// Obtém o endereço formatado a partir das coordenadas (latitude e longitude).
     /// </summary>
     [HttpGet("geolocalizacao")]
+    [AllowAnonymous]
     public async Task<IActionResult> ObterEndereco([FromQuery] double latitude, [FromQuery] double longitude)
     {
         try
@@ -40,6 +43,7 @@ public class LocalizacaoController : ControllerBase
     /// Calcula a distância entre dois endereços.
     /// </summary>
     [HttpGet("distancia")]
+    [AllowAnonymous]
     public async Task<IActionResult> CalcularDistancia([FromQuery] string origem, [FromQuery] string destino)
     {
         try
@@ -57,6 +61,7 @@ public class LocalizacaoController : ControllerBase
     /// Obtém sugestões de endereços conforme o usuário digita.
     /// </summary>
     [HttpGet("sugestoes")]
+    [AllowAnonymous]
     public async Task<IActionResult> ObterSugestoes([FromQuery] string input)
     {
         try

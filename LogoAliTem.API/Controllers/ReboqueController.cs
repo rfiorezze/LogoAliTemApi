@@ -1,4 +1,5 @@
 ﻿using LogoAliTem.Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 namespace LogoAliTem.API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class ReboqueController : ControllerBase
     {
@@ -21,6 +23,7 @@ namespace LogoAliTem.API.Controllers
         /// Calcula o valor estimado do reboque com base na distância entre retirada e destino.
         /// </summary>
         [HttpPost("calcular")]
+        [AllowAnonymous]
         public async Task<IActionResult> CalcularValor([FromBody] ReboqueCalculoDto request)
         {
             try
@@ -44,6 +47,7 @@ namespace LogoAliTem.API.Controllers
         /// Solicita um reboque com base nos dados informados.
         /// </summary>
         [HttpPost("contratar")]
+        [AllowAnonymous]
         public async Task<IActionResult> ContratarReboque([FromBody] ReboqueSolicitacaoDto request)
         {
             try
