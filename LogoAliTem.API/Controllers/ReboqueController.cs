@@ -1,6 +1,4 @@
 ﻿using LogoAliTem.Application.Dtos;
-using LogoAliTem.Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;

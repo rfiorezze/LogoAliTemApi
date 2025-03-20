@@ -2,6 +2,7 @@
 using LogoAliTem.Application.Dtos;
 using LogoAliTem.Application.Interfaces;
 using LogoAliTem.Domain;
+using LogoAliTem.Domain.Helpers;
 using LogoAliTem.Persistence.Interfaces;
 using System;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 public class ReboqueService : IReboqueService
 {
-    private const string EnderecoEscritorio = "7RGX+Q4W Esmeraldas, MG";
+    private const string EnderecoEscritorio = "R. Um, Alameda Ipê Amarelo, 153, Esmeraldas - MG, 35740-000";
     private readonly IBaseRepository _baseRepository;
     private readonly IMapper _mapper;
     private readonly ILocalizacaoService _localizacaoService;
@@ -33,7 +34,16 @@ public class ReboqueService : IReboqueService
 
             double distanciaTotal = distancia1 + distancia2 + distancia3;
 
-            return distanciaTotal <= 40 ? 140 : distanciaTotal * 4;
+            // Define o valor por km baseado no tipo de veículo
+            double valorPorKm = request.TipoVeiculo switch
+            {
+                "Leve" => 4.20,
+                "Utilitario" => 4.70,
+                "Semi-Pesado" => 5.20,
+                _ => throw new ArgumentException("Tipo de veículo inválido") // Lança erro se o tipo for desconhecido
+            };
+
+            return distanciaTotal <= 40 ? 149.90 : distanciaTotal * valorPorKm;
         }
         catch (Exception ex)
         {
@@ -75,18 +85,21 @@ public class ReboqueService : IReboqueService
             string assunto = "Nova Solicitação de Reboque";
             StringBuilder corpo = new StringBuilder();
 
+            // Converte a data para o horário de Brasília
+            DateTime dataBrasilia = TimeZoneHelper.ConvertToBrasilia(DateTime.UtcNow);
+
             corpo.AppendLine("<h3>Detalhes da Solicitação de Reboque:</h3>");
             corpo.AppendLine($"<p><b>Tipo de Veículo:</b> {request.TipoVeiculo}</p>");
             corpo.AppendLine($"<p><b>Local de Retirada:</b> {request.LocalRetirada}</p>");
             corpo.AppendLine($"<p><b>Local de Destino:</b> {request.LocalDestino}</p>");
             corpo.AppendLine($"<p><b>Valor Estimado:</b> R$ {request.ValorEstimado:F2}</p>");
-            corpo.AppendLine($"<p><b>Data da Solicitação:</b> {DateTime.UtcNow:dd/MM/yyyy HH:mm}</p>");
+            corpo.AppendLine($"<p><b>Data da Solicitação:</b> {dataBrasilia:dd/MM/yyyy HH:mm}</p>");
 
             await _emailService.EnviarEmailAsync(
-                emailDestino: "contato@logoalitem.com.br",
+                emailDestino: "servicoslogoalitem@gmail.com",
                 assunto: assunto,
                 corpo: corpo.ToString(),
-                copiaPara: "",
+                copiaPara: "contato@logoalitem.com.br",
                 anexo: null,
                 nomeArquivoAnexo: ""
             );
