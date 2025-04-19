@@ -13,4 +13,5 @@ public interface IMotoristaRepository
     Task<Motorista> GetMotoristaByIdAsync(int motoristaId);
     Task<Motorista> GetMotoristaByCpfAsync(string cpf);
     Task<Motorista> GetMotoristaByCpfAndUserIdAsync(string cpf, int userId);
+    Task<int> ContarMotoristasAsync();
 }

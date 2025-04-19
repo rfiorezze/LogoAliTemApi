@@ -146,4 +146,18 @@ public class VeiculosController : ControllerBase
             return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar deletar um Veiculo. Erro: {ex.Message}");
         }
     }
+
+    [HttpGet("quantidade")]
+    public async Task<IActionResult> ObterQuantidade()
+    {
+        try
+        {
+            var total = await _veiculoService.ObterQuantidadeVeiculosAsync();
+            return Ok(total);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro ao buscar quantidade de veículos: {ex.Message}");
+        }
+    }
 }

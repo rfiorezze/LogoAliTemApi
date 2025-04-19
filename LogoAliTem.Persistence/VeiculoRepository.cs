@@ -58,4 +58,8 @@ public class VeiculoRepository : IVeiculoRepository
 
         return await query.ToArrayAsync();
     }
+    public async Task<int> ContarVeiculosAsync()
+    {
+        return await _context.Veiculos.CountAsync();
+    }
 }

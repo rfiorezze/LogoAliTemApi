@@ -193,4 +193,17 @@ public class MotoristaService : IMotoristaService
             throw new Exception($"Erro ao tentar buscar motorista por ID. Erro: {ex.Message}");
         }
     }
+
+    public async Task<int> GetTotalMotoristasAsync()
+    {
+        try
+        {
+            return await _motoristaRepository.ContarMotoristasAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Erro ao obter a quantidade de motoristas. Erro: {ex.Message}");
+        }
+    }
+
 }

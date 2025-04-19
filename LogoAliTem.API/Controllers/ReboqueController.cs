@@ -1,4 +1,5 @@
 ﻿using LogoAliTem.Application.Dtos;
+using LogoAliTem.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +63,23 @@ namespace LogoAliTem.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao contratar reboque. Erro: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Retorna os indicadores de reboque, incluindo total de cálculos, contratações e taxa de conversão.
+        /// </summary>
+        [HttpGet("indicadores")]
+        public async Task<IActionResult> ObterIndicadores()
+        {
+            try
+            {
+                var indicadores = await _reboqueService.ObterIndicadoresAsync();
+                return Ok(indicadores);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao obter indicadores. Erro: {ex.Message}");
             }
         }
     }

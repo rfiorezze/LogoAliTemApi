@@ -12,4 +12,5 @@ public interface IVeiculoService
     Task<VeiculoDto[]> GetVeiculoByPlacaAsync(string placa);
     Task<VeiculoDto> GetVeiculoByIdAsync(int VeiculoId);
     Task<VeiculoDto[]> GetVeiculosByMotoristaIdAsync(int motoristaId);
+    Task<int> ObterQuantidadeVeiculosAsync();
 }

@@ -3,6 +3,7 @@ using System;
 using LogoAliTem.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LogoAliTem.Persistence.Migrations
 {
     [DbContext(typeof(LogoAliTemContext))]
-    partial class LogoAliTemContextModelSnapshot : ModelSnapshot
+    [Migration("20250410232646_AddEstadiaTables4")]
+    partial class AddEstadiaTables4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,11 +105,8 @@ namespace LogoAliTem.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("Arquivo")
-                        .IsRequired()
-                        .HasColumnType("bytea");
-
                     b.Property<string>("BairroContratante")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -122,6 +121,7 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("BairroMotorista")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -129,6 +129,7 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("CepContratante")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
@@ -143,10 +144,12 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(10)");
 
                     b.Property<string>("CepMotorista")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
                     b.Property<string>("CidadeContratante")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -161,6 +164,7 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("CidadeMotorista")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -181,6 +185,7 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("CpfCnpjContratante")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
@@ -206,14 +211,17 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("EmailContratante")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("EmailLocalCarga")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("EmailLocalDescarga")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -223,6 +231,7 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("EstadoContratante")
+                        .IsRequired()
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)");
 
@@ -237,10 +246,12 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(2)");
 
                     b.Property<string>("EstadoMotorista")
+                        .IsRequired()
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)");
 
                     b.Property<string>("LogradouroContratante")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -255,10 +266,12 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("LogradouroMotorista")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("NomeContratante")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
@@ -282,12 +295,10 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<string>("NumeroLocalCarga")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
                     b.Property<string>("NumeroLocalDescarga")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
@@ -305,14 +316,17 @@ namespace LogoAliTem.Persistence.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<string>("TelefoneContratante")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
                     b.Property<string>("TelefoneLocalCarga")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
                     b.Property<string>("TelefoneLocalDescarga")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
@@ -574,11 +588,6 @@ namespace LogoAliTem.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Placa")
-                        .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("character varying(7)");
 
                     b.Property<string>("TipoVeiculo")
                         .IsRequired()

@@ -76,14 +76,20 @@ public class Startup
         services.AddScoped<IMotoristaService, MotoristaService>();
         services.AddScoped<IBaseRepository, BaseRepository>();
         services.AddScoped<IMotoristaRepository, MotoristaRepository>();
-        services.AddScoped<IVeiculoRepository, VeiculoRepository>();
+        services.AddScoped<IVeiculoRepository, VeiculoRepository>();    
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICalculoReboqueRepository, CalculoReboqueRepository>();
+        services.AddScoped<ICalculoReboqueRepository, CalculoReboqueRepository>();
+        services.AddScoped<ICalculoEstadiaRepository, CalculoEstadiaRepository>();
+        services.AddScoped<ICertidaoEstadiaRepository, CertidaoEstadiaRepository>();
+        services.AddScoped<IReboqueSolicitacaoRepository, ReboqueSolicitacaoRepository>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IVeiculoService, VeiculoService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<ILocalizacaoService, LocalizacaoService>();
         services.AddScoped<IReboqueService, ReboqueService>();
+        services.AddScoped<IEstadiaService, EstadiaService>();
 
         services.AddCors();
         services.AddSwaggerGen(options =>

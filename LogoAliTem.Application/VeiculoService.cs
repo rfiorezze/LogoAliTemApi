@@ -150,4 +150,15 @@ public class VeiculoService : IVeiculoService
             throw new Exception(ex.Message);
         }
     }
+    public async Task<int> ObterQuantidadeVeiculosAsync()
+    {
+        try
+        {
+            return await _VeiculoRepository.ContarVeiculosAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Erro ao obter a quantidade de veículos: " + ex.Message);
+        }
+    }
 }

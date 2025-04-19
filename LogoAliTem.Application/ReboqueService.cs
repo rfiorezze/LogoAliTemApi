@@ -8,6 +8,8 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 
+namespace LogoAliTem.Application;
+
 public class ReboqueService : IReboqueService
 {
     private const string EnderecoEscritorio = "R. Um, Alameda Ipê Amarelo, 153, Esmeraldas - MG, 35740-000";
@@ -15,14 +17,25 @@ public class ReboqueService : IReboqueService
     private readonly IMapper _mapper;
     private readonly ILocalizacaoService _localizacaoService;
     private readonly IEmailService _emailService;
+    private readonly ICalculoReboqueRepository _calculoReboqueRepository;
+    private readonly IReboqueSolicitacaoRepository _reboqueSolicitacaoRepository;
 
-    public ReboqueService(IBaseRepository baseRepository, IMapper mapper, ILocalizacaoService localizacaoService, IEmailService emailService)
+    public ReboqueService(
+        IBaseRepository baseRepository,
+        IMapper mapper,
+        ILocalizacaoService localizacaoService,
+        IEmailService emailService,
+        ICalculoReboqueRepository calculoReboqueRepository,
+        IReboqueSolicitacaoRepository reboqueSolicitacaoRepository)
     {
         _baseRepository = baseRepository;
         _mapper = mapper;
         _localizacaoService = localizacaoService;
         _emailService = emailService;
+        _calculoReboqueRepository = calculoReboqueRepository;
+        _reboqueSolicitacaoRepository = reboqueSolicitacaoRepository;
     }
+
 
     public async Task<double?> CalcularValorAsync(ReboqueCalculoDto request)
     {
@@ -34,16 +47,38 @@ public class ReboqueService : IReboqueService
 
             double distanciaTotal = distancia1 + distancia2 + distancia3;
 
-            // Define o valor por km baseado no tipo de veículo
-            double valorPorKm = request.TipoVeiculo switch
+            (double valorPorKm, double arrancada) = request.TipoVeiculo switch
             {
-                "Leve" => 4.20,
-                "Utilitario" => 4.70,
-                "Semi-Pesado" => 5.20,
-                _ => throw new ArgumentException("Tipo de veículo inválido") // Lança erro se o tipo for desconhecido
+                "Leve" => (3.80, 149.90),
+                "Utilitario" => (4.50, 169.90),
+                "Semi-Pesado" => (5.00, 275.90),
+                _ => throw new ArgumentException("Tipo de veículo inválido")
             };
 
-            return distanciaTotal <= 40 ? 149.90 : distanciaTotal * valorPorKm;
+            double valorFinal = distanciaTotal <= 40 ? arrancada : distanciaTotal * valorPorKm;
+
+            // Registra o cálculo
+            await _calculoReboqueRepository.RegistrarCalculoAsync(_mapper.Map<CalculoReboque>(request));
+
+            // Notifica o cliente
+            await _emailService.EnviarEmailAsync(
+                emailDestino: "servicoslogoalitem@gmail.com",
+                assunto: "Novo Cálculo de Reboque",
+                corpo: $@"
+                <h3>Detalhes do Cálculo de Reboque:</h3>
+                <p><b>Tipo de Veículo:</b> {request.TipoVeiculo}</p>
+                <p><b>Local de Retirada:</b> {request.LocalRetirada}</p>
+                <p><b>Local de Destino:</b> {request.LocalDestino}</p>
+                <p><b>Distância Total:</b> {distanciaTotal:F2} km</p>
+                <p><b>Valor Estimado:</b> R$ {valorFinal:F2}</p>
+                <p><b>Data do Cálculo:</b> {TimeZoneHelper.ConvertToBrasilia(DateTime.UtcNow):dd/MM/yyyy HH:mm}</p>
+            ",
+                copiaPara: null,
+                anexo: null,
+                nomeArquivoAnexo: null
+            );
+
+            return valorFinal;
         }
         catch (Exception ex)
         {
@@ -90,6 +125,7 @@ public class ReboqueService : IReboqueService
 
             corpo.AppendLine("<h3>Detalhes da Solicitação de Reboque:</h3>");
             corpo.AppendLine($"<p><b>Tipo de Veículo:</b> {request.TipoVeiculo}</p>");
+            corpo.AppendLine($"<p><b>Placa do Veículo:</b> {request.Placa}</p>");
             corpo.AppendLine($"<p><b>Local de Retirada:</b> {request.LocalRetirada}</p>");
             corpo.AppendLine($"<p><b>Local de Destino:</b> {request.LocalDestino}</p>");
             corpo.AppendLine($"<p><b>Valor Estimado:</b> R$ {request.ValorEstimado:F2}</p>");
@@ -109,4 +145,17 @@ public class ReboqueService : IReboqueService
             Console.WriteLine($"Erro ao enviar e-mail de reboque: {ex.Message}");
         }
     }
+
+    public async Task<IndicadoresReboqueDto> ObterIndicadoresAsync()
+    {
+        var totalCalculos = await _calculoReboqueRepository.GetTotalCalculosAsync();
+        var totalContratacoes = await _reboqueSolicitacaoRepository.GetTotalSolicitacoesAsync();
+
+        return new IndicadoresReboqueDto
+        {
+            TotalCalculos = totalCalculos,
+            TotalContratacoes = totalContratacoes
+        };
+    }
+
 }

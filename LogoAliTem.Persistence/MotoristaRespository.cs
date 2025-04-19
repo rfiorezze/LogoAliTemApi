@@ -127,4 +127,8 @@ public class MotoristaRepository : IMotoristaRepository
 
         return await query.FirstOrDefaultAsync();
     }
+    public async Task<int> ContarMotoristasAsync()
+    {
+        return await _context.Motoristas.CountAsync();
+    }
 }

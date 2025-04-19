@@ -4,12 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LogoAliTem.Domain
 {
-    public class ReboqueSolicitacao
+    public class CalculoReboque
     {
         [Key]
         public int Id { get; set; }
-
-        public int? UserId { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -24,14 +22,13 @@ namespace LogoAliTem.Domain
         public string LocalDestino { get; set; }
 
         [Required]
-        public double ValorEstimado { get; set; }
+        public double DistanciaTotal { get; set; }
+
+        [Required]
+        public double ValorCalculado { get; set; }
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime DataSolicitacao { get; set; } = DateTime.UtcNow;
-
-        [Required]
-        [StringLength(7)]
-        public string Placa { get; set; }
+        public DateTime DataCalculo { get; set; } = DateTime.UtcNow;
     }
 }

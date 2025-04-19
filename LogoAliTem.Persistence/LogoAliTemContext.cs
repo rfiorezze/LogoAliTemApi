@@ -17,6 +17,9 @@ namespace LogoAliTem.Persistence
         public DbSet<Motorista> Motoristas { get; set; }
         public DbSet<Veiculo> Veiculos { get; set; }
         public DbSet<ReboqueSolicitacao> Reboques { get; set; }
+        public DbSet<CalculoReboque> CalculoReboque { get; set; }
+        public DbSet<CalculoEstadia> CalculoEstadia { get; set; }
+        public DbSet<CertidaoEstadia> CertidaoEstadia { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +50,13 @@ namespace LogoAliTem.Persistence
                 .HasMany(m => m.Veiculos)
                 .WithOne(v => v.Motorista)
                 .HasForeignKey(v => v.MotoristaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relacionamento 1:1 entre CalculoEstadia e CertidaoEstadia
+            modelBuilder.Entity<CalculoEstadia>()
+                .HasOne(c => c.CertidaoEstadia)
+                .WithOne(e => e.CalculoEstadia)
+                .HasForeignKey<CertidaoEstadia>(e => e.CalculoEstadiaId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
 

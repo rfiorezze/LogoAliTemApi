@@ -12,4 +12,5 @@ public interface IMotoristaService
     Task<MotoristaDto[]> GetAllMotoristasByEstadoCidadeAsync(string estado, string cidade, int userId);
     Task<MotoristaDto> GetMotoristaByCpfAsync(string cpf, int userId);
     Task<MotoristaDto> GetMotoristaByIdAsync(int motoristaId, int userId);
+    Task<int> GetTotalMotoristasAsync();
 }

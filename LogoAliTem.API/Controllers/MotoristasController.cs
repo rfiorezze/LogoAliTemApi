@@ -161,4 +161,18 @@ public class MotoristasController : ControllerBase
             return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao tentar deletar um motorista. Erro: {ex.Message}");
         }
     }
+
+    [HttpGet("quantidade")]
+    public async Task<IActionResult> GetQuantidadeMotoristas()
+    {
+        try
+        {
+            var total = await _motoristaService.GetTotalMotoristasAsync();
+            return Ok(new { total });
+        }
+        catch (Exception ex)
+        {
+            return this.StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao obter a quantidade de motoristas. Erro: {ex.Message}");
+        }
+    }
 }

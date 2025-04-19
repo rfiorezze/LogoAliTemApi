@@ -9,5 +9,6 @@ namespace LogoAliTem.Persistence.Interfaces
         Task<Veiculo[]> GetVeiculoByPlacaAsync(string placa);
         Task<Veiculo> GetVeiculoByIdAsync(int veiculoId);
         Task<Veiculo[]> GetVeiculosByMotoristaIdAsync(int motoristaId);
+        Task<int> ContarVeiculosAsync();
     }
 }
